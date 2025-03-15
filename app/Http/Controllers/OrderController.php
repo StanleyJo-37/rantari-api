@@ -13,12 +13,12 @@ class OrderController extends Controller
     public function getAllOrders(Request $request)
     {
         try {
-            // $user = $request->user();
-            $user_id = $request->user_id;
+            $user = $request->user();
+            // $user_id = $request->user_id;
 
-            // if (!isset($user)) {
-            //     return response()->json("Silakan login kembali.", 403);
-            // }
+            if (!isset($user)) {
+                return response()->json("Silakan login kembali.", 403);
+            }
 
             $orders = [];
 
