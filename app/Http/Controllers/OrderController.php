@@ -23,10 +23,10 @@ class OrderController extends Controller
             $orders = [];
 
             
-            // if ($user->role === "seller") {
+            if ($user->role === "seller") {
                 
                 
-            // } else {
+            } else {
                 $orders = DB::table('orders as o')
                             ->select([
                                 'o.order_code',
@@ -56,11 +56,11 @@ class OrderController extends Controller
                             ->where('o.buyer_id', '=', $user_id)
                             ->get();
 
-                foreach ($orders as &$o) {
-                    $o->order_details = json_decode($o->order_details);
-                }
-
-            // }
+                            
+            }
+            foreach ($orders as &$o) {
+                $o->order_details = json_decode($o->order_details);
+            }
 
             return response()->json($orders);
 
