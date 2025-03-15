@@ -43,8 +43,7 @@ class OrderController extends Controller
                             ])
                             ->join('users as u', 'u.id', '=', 'o.buyer_id')
                             ->join('listings as l', function ($join) {
-                                $join->on('l.id', '=', 'o.listing_id')
-                                    ->whereNull('l.deleted_at');
+                                $join->on('l.id', '=', 'o.listing_id');
                             })
                             ->leftJoin('products as p', 'p.id', '=', 'l.product_id')
                             ->leftJoin('asset_relations as ar', function ($join) {
