@@ -67,7 +67,7 @@ class RegisterRequest extends FormRequest
             return $user;
         }
         catch (Exception $e) {
-            dd($e);
+            throw $e;
             return null;
         }
     }

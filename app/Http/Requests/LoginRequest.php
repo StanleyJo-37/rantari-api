@@ -27,7 +27,7 @@ class LoginRequest extends FormRequest
             //
             'email' => 'email|required',
             'password' => 'string|min:8|required',
-            'remember' => 'boolean|nullable',
+            // 'remember' => 'boolean|nullable',
         ];
     }
 
@@ -53,12 +53,12 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): ?User
     {
-        if (! Auth::attempt($this->validated(), $this->boolean("remember"))) {
+        if (! Auth::attempt($this->validated())) {
             $this->failedLogin();
             return null;
         }
         
-        return User::with('teams')->find(Auth::id());
+        return User::find(Auth::id());
     }
 
     /**
