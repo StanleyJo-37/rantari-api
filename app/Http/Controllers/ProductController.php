@@ -97,7 +97,7 @@ class ProductController extends Controller
         }
     }
 
-    public function editTodo(Request $request, int $product_id)
+    public function editProduct(Request $request, int $product_id)
     {
         try {
             $request->validate([
