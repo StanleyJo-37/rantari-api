@@ -13,24 +13,33 @@ class OrderController extends Controller
     public function getAllOrders(Request $request)
     {
         try {
-            $user = $request->user();
+            // $user = $request->user();
+            $user_id = $request->user_id;
 
-            if (!isset($user)) {
-                return response()->json("Silakan login kembali.", 403);
-            }
+            // if (!isset($user)) {
+            //     return response()->json("Silakan login kembali.", 403);
+            // }
 
             $orders = [];
 
             
-            if ($user->role === "seller") {
+            // if ($user->role === "seller") {
+                
+                
+            // } else {
                 $orders = DB::table('orders as o')
                             ->select([
-                                'p.name',
-                                'p.scientific_name',
-                                'p.type',
-                                DB::raw('(p.weight_per_unit_g * o.unit_bought) AS weight_bought'),
-                                DB::raw('(l.price_per_unit * o.unit_bought) AS total_price'),
-                                DB::raw('COALESCE(GROUP_CONCAT(a.path), NULL) AS thumbnail') // Ensure single or multiple images
+                                'o.order_code',
+                                DB::raw("JSON_AGG(
+                                    JSON_BUILD_OBJECT(
+                                        'name', p.name,
+                                        'scientific_name', p.scientific_name,
+                                        'type', p.type,
+                                        'weight_bought', p.weight_per_unit_g * o.unit_bought,
+                                        'total_price', l.price_per_unit * o.unit_bought,
+                                        'thumbnail', a.path
+                                    )
+                                ) AS order_details")
                             ])
                             ->join('users as u', 'u.id', '=', 'o.buyer_id')
                             ->join('listings as l', function ($join) {
@@ -43,13 +52,17 @@ class OrderController extends Controller
                                     ->where('ar.model_type', '=', Product::class);
                             })
                             ->leftJoin('assets as a', 'a.id', '=', 'ar.asset_id')
-                            ->groupBy('o.order_code', 'p.name', 'p.scientific_name', 'p.type', 'p.weight_per_unit_g', 'o.unit_bought', 'l.price_per_unit')
+                            ->groupBy('o.order_code')
+                            ->where('o.buyer_id', '=', $user_id)
                             ->get();
 
-                
-            } else {
+                foreach ($orders as &$o) {
+                    $o->order_details = json_decode($o->order_details);
+                }
 
-            }
+            // }
+
+            return response()->json($orders);
 
         } catch (Exception $e) {
             return response()->json(
